@@ -28,7 +28,7 @@ public class ForumServiceImpl implements ForumService {
 
 	private PostResponseDto postToPostResponseDto(Post post) {
 		return new PostResponseDto(post.getId(), post.getTitle(), post.getContent(),
-				post.getAuthor(), post.getDateCreated(), post.getTags(), post.getComments());
+				post.getAuthor(), post.getDateCreated(), post.getTags(), post.getLikes(), post.getComments());
 	}
 
 	@Override

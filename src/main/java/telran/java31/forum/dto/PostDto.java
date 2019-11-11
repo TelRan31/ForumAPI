@@ -1,5 +1,7 @@
 package telran.java31.forum.dto;
 
+import java.util.Set;
+
 import lombok.Builder;
 import lombok.Getter;
 
@@ -8,6 +10,6 @@ import lombok.Getter;
 public class PostDto {
 	String title;
 	String content;
-	String [] tags;
+	Set<String> tags;
 
 }

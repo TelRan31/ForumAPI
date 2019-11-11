@@ -3,6 +3,7 @@ package telran.java31.forum.model;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -30,11 +31,11 @@ public class Post {
 	@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
 	LocalDateTime dateCreated;
 	@Setter
-	String[] tags;
+	Set<String> tags;
 	int likes;
 	List<Comment> comments;
 
-	public Post(String title, String content, String author, String[] tags) {
+	public Post(String title, String content, String author, Set<String> tags) {
 		id = new ObjectId().toString();
 		this.title = title;
 		this.content = content;
