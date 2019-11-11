@@ -30,5 +30,4 @@ public class PostResponseDto {
 	@Singular
 	List<Comment> comments;
 	
-
 }

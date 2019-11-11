@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import telran.java31.forum.dto.CommentDto;
+import telran.java31.forum.dto.DatePeriodDto;
 import telran.java31.forum.dto.PostDto;
 import telran.java31.forum.dto.PostResponseDto;
 import telran.java31.forum.service.ForumService;
@@ -62,6 +63,16 @@ public class ForumController {
 	public List<PostResponseDto> findPostByAuthor(@PathVariable String author) {
 		return forumService.findPostByAuthor(author);
 
+	}
+
+	@PostMapping("/forum/posts/tags")
+	public Iterable<PostResponseDto> findPostsByTags(@RequestBody List<String> tags) {
+		return forumService.findPostsByTags(tags);
+	}
+
+	@PostMapping("/forum/posts/period")
+	public Iterable<PostResponseDto> findPostsCreatedBetweenDates(@RequestBody DatePeriodDto datePeriodDto) {
+		return forumService.findPostsCreatedBetweenDates(datePeriodDto);
 	}
 
 }
