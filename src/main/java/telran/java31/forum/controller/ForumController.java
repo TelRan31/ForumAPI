@@ -9,70 +9,76 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import telran.java31.forum.dto.CommentDto;
 import telran.java31.forum.dto.DatePeriodDto;
+import telran.java31.forum.dto.NewCommentDto;
+import telran.java31.forum.dto.NewPostDto;
 import telran.java31.forum.dto.PostDto;
-import telran.java31.forum.dto.PostResponseDto;
 import telran.java31.forum.service.ForumService;
 
 @RestController
+@RequestMapping("/forum")
 public class ForumController {
 	@Autowired
-	ForumService forumService;
+	ForumService service;
 
-	@PostMapping("/forum/post/{author}")
-	public PostResponseDto addPost(@PathVariable String author, @RequestBody PostDto postDto) {
-		return forumService.addPost(author, postDto);
-
+	@PostMapping("/post/{author}")
+	public PostDto addPost(@RequestBody NewPostDto newPost, @PathVariable("author") String author) {
+		return service.addNewPost(newPost, author);
 	}
 
-	@GetMapping("/forum/post/{id}")
-	public PostResponseDto findPostById(@PathVariable String id) {
-		return forumService.findPostById(id);
-
+	@GetMapping("/post/{id}")
+	public PostDto getPost(@PathVariable String id) {
+		return service.getPost(id);
 	}
 
-	@DeleteMapping("/forum/post/{id}")
-	public PostResponseDto deletePost(@PathVariable String id) {
-		return forumService.deletePost(id);
-
+	@DeleteMapping("/post/{id}")
+	public PostDto removePost(@PathVariable String id) {
+		return service.removePost(id);
 	}
 
-	@PutMapping("/forum/post/{id}")
-	public PostResponseDto updatePost(@PathVariable String id, @RequestBody PostDto postDto) {
-		return forumService.updatePost(id, postDto);
-
+	@PutMapping("/post/{id}")
+	public PostDto updatePost(@PathVariable String id, @RequestBody NewPostDto postUpdateDto) {
+		return service.updatePost(postUpdateDto, id);
 	}
 
-	@PutMapping("/forum/post/{id}/like")
-	public boolean addLikeToPost(@PathVariable String id) {
-		return forumService.addLikeToPost(id);
-
+	@PutMapping("/post/{id}/like")
+	public boolean addLike(@PathVariable String id) {
+		return service.addLike(id);
 	}
 
-	@PutMapping("/forum/post/{id}/comment/{author}")
-	public PostResponseDto addCommentToPost(@PathVariable String id, @PathVariable String author,
-			@RequestBody CommentDto commentDto) {
-		return forumService.addCommentToPost(id, author, commentDto);
-
+	@PutMapping("/post/{id}/comment/{author}")
+	public PostDto addComment(@PathVariable String id, @PathVariable String author, @RequestBody NewCommentDto newCommentDto) {
+		return service.addComment(id, author, newCommentDto);
 	}
 
-	@GetMapping("/forum/posts/author/{author}")
-	public List<PostResponseDto> findPostByAuthor(@PathVariable String author) {
-		return forumService.findPostByAuthor(author);
-
+	@GetMapping("/posts/author/{author}")
+	public Iterable<PostDto> getPostsByAuthor(@PathVariable String author) {
+		return service.findPostsByAuthor(author);
 	}
-
-	@PostMapping("/forum/posts/tags")
-	public Iterable<PostResponseDto> findPostsByTags(@RequestBody List<String> tags) {
-		return forumService.findPostsByTags(tags);
+	
+	@PostMapping("/posts/tags")
+	public Iterable<PostDto> findPostsByTags(@RequestBody List<String> tags) {
+		return service.findPostsByTags(tags);
 	}
-
-	@PostMapping("/forum/posts/period")
-	public Iterable<PostResponseDto> findPostsCreatedBetweenDates(@RequestBody DatePeriodDto datePeriodDto) {
-		return forumService.findPostsCreatedBetweenDates(datePeriodDto);
+	
+	@PostMapping("/posts/period")
+	public Iterable<PostDto> findPostsByPeriod(@RequestBody DatePeriodDto datePeriodDto) {
+		return service.findPostsCreatedBetweenDates(datePeriodDto);
+		
+	}
+	
+	@GetMapping("/post/{id}/comments")
+	public Iterable<CommentDto> findAllPostComments(@PathVariable String id){
+		return service.findAllPostComments(id);
+	}
+	
+	@GetMapping("/post/{id}/author/{author}/comments")
+	public Iterable<CommentDto> findAllPostCommentsByAuthor(@PathVariable String id, @PathVariable String author) {
+		return service.findAllPostCommentsByAuthor(id, author);
 	}
 
 }

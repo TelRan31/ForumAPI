@@ -1,4 +1,5 @@
-package telran.java31.forum.dto;
+package telran.java31.forum.exceptions;
+
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

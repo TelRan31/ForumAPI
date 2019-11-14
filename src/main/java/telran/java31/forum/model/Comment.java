@@ -27,11 +27,9 @@ public class Comment {
 		this.message = message;
 		dateCreated = LocalDateTime.now();
 	}
-	
+
 	public void addLike() {
 		likes++;
 	}
-	
-	
 
 }

@@ -2,7 +2,9 @@ package telran.java31.forum.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,109 +12,148 @@ import org.springframework.stereotype.Service;
 import telran.java31.forum.dao.ForumRepository;
 import telran.java31.forum.dto.CommentDto;
 import telran.java31.forum.dto.DatePeriodDto;
+import telran.java31.forum.dto.NewCommentDto;
+import telran.java31.forum.dto.NewPostDto;
 import telran.java31.forum.dto.PostDto;
-import telran.java31.forum.dto.PostNotFoundException;
-import telran.java31.forum.dto.PostResponseDto;
-import telran.java31.forum.dto.WrongDateFormatException;
+import telran.java31.forum.exceptions.PostNotFoundException;
+import telran.java31.forum.exceptions.WrongDateFormatException;
 import telran.java31.forum.model.Comment;
 import telran.java31.forum.model.Post;
 
 @Service
 public class ForumServiceImpl implements ForumService {
+	
 	@Autowired
 	ForumRepository forumRepository;
 
 	@Override
-	public PostResponseDto addPost(String author, PostDto postDto) {
-		Post post = new Post(postDto.getTitle(), postDto.getContent(), author, postDto.getTags());
-		forumRepository.save(post);
-		return postToPostResponseDto(post);
-	}
-
-	private PostResponseDto postToPostResponseDto(Post post) {
-		return new PostResponseDto(post.getId(), post.getTitle(), post.getContent(), post.getAuthor(),
-				post.getDateCreated(), post.getTags(), post.getLikes(), post.getComments());
+	public PostDto addNewPost(NewPostDto newPost, String author) {
+		Post post = new Post(newPost.getTitle(), newPost.getContent(),
+				author, newPost.getTags());
+		post = forumRepository.save(post);
+		return convertToPostDto(post);
 	}
 
 	@Override
-	public PostResponseDto findPostById(String id) {
+	public PostDto getPost(String id) {
 		Post post = forumRepository.findById(id).orElseThrow(() -> new PostNotFoundException(id));
-		return postToPostResponseDto(post);
+		return convertToPostDto(post);
 	}
 
 	@Override
-	public PostResponseDto deletePost(String id) {
+	public PostDto removePost(String id) {
 		Post post = forumRepository.findById(id).orElseThrow(() -> new PostNotFoundException(id));
 		forumRepository.delete(post);
-		return postToPostResponseDto(post);
+		return convertToPostDto(post);
 	}
 
 	@Override
-	public PostResponseDto updatePost(String id, PostDto postDto) {
+	public PostDto updatePost(NewPostDto postUpdateDto, String id) {
 		Post post = forumRepository.findById(id).orElseThrow(() -> new PostNotFoundException(id));
-		if (post.getTitle() != null) {
-			post.setTitle(postDto.getTitle());
+		String content = postUpdateDto.getContent();
+		if (content != null) {
+			post.setContent(content);
 		}
-		if (post.getContent() != null) {
-			post.setContent(postDto.getContent());
+		String title = postUpdateDto.getTitle();
+		if (title != null) {
+			post.setTitle(title);
 		}
-		if (post.getTags() != null) {
-			post.setTags(postDto.getTags());
+		Set<String> tags = postUpdateDto.getTags();
+		if (tags != null) {
+			tags.forEach(post::addTag);
 		}
 		forumRepository.save(post);
-		return postToPostResponseDto(post);
+		return convertToPostDto(post);
 	}
 
 	@Override
-	public boolean addLikeToPost(String id) {
-		if (forumRepository.existsById(id)) {
-			Post post = forumRepository.findById(id).orElseThrow(() -> new PostNotFoundException(id));
-			post.addLikePost();
+	public boolean addLike(String id) {
+		Post post = forumRepository.findById(id).orElse(null);
+		if (post != null) {
+			post.addLike();
 			forumRepository.save(post);
 			return true;
-		} else {
-			return false;
 		}
-
+		return false;
 	}
 
 	@Override
-	public PostResponseDto addCommentToPost(String id, String author, CommentDto commentDto) {
+	public PostDto addComment(String id, String author, NewCommentDto newCommentDto) {
 		Post post = forumRepository.findById(id).orElseThrow(() -> new PostNotFoundException(id));
-		Comment comment = new Comment(author, commentDto.getMassege());
-		post.addComment(comment);
+		post.addComment(convertToComment(author, newCommentDto.getMessage()));
 		forumRepository.save(post);
-		return postToPostResponseDto(post);
+		return convertToPostDto(post);
 	}
 
 	@Override
-	public List<PostResponseDto> findPostByAuthor(String author) {
-
+	public Iterable<PostDto> findPostsByAuthor(String author) {
 		return forumRepository.findByAuthor(author)
-				.map(this::postToPostResponseDto)
+				.map(this::convertToPostDto)
 				.collect(Collectors.toList());
 	}
-
+	
+	private PostDto convertToPostDto(Post post) {
+		return PostDto.builder()
+				.id(post.getId())
+				.author(post.getAuthor())
+				.title(post.getTitle())
+				.dateCreated(post.getDateCreated())
+				.content(post.getContent())
+				.tags(post.getTags())
+				.likes(post.getLikes())
+				.comments(post.getComments().stream().map(this::convertToCommentDto).collect(Collectors.toList()))
+				.build();
+	}
+	
+	
 	@Override
-	public Iterable<PostResponseDto> findPostsByTags(List<String> tags) {
-
+	public Iterable<PostDto> findPostsByTags(List<String> tags) {
 		return forumRepository.findByTagsIn(tags)
-				.map(this::postToPostResponseDto)
+				.map(this::convertToPostDto)
 				.collect(Collectors.toList());
 	}
 
 	@Override
-	public Iterable<PostResponseDto> findPostsCreatedBetweenDates(DatePeriodDto datePeriodDto) {
+	public Iterable<PostDto> findPostsCreatedBetweenDates(DatePeriodDto datePeriodDto) {
 		try {
 			LocalDate from = LocalDate.parse(datePeriodDto.getDateFrom());
 			LocalDate to = LocalDate.parse(datePeriodDto.getDateTo());
 			return forumRepository.findByDateCreatedBetween(from, to)
-					.map(this::postToPostResponseDto)
+					.map(this::convertToPostDto)
 					.collect(Collectors.toList());
 		} catch (Exception e) {
 			throw new WrongDateFormatException();
-
 		}
-
 	}
+
+	@Override
+	public Iterable<CommentDto> findAllPostComments(String id) {
+		Post post = forumRepository.findById(id).orElseThrow(() -> new PostNotFoundException(id));
+		Set<Comment> comments = post.getComments();
+		return comments.stream().map(this::convertToCommentDto).collect(Collectors.toList());
+	}
+
+	@Override
+	public Iterable<CommentDto> findAllPostCommentsByAuthor(String id, String author) {
+		Post post = forumRepository.findById(id).orElseThrow(() -> new PostNotFoundException(id));
+		Stream<Comment> comments = post.getComments()
+				.stream()
+				.filter(p -> author.equals(p.getUser()));
+		return comments.map(this::convertToCommentDto).collect(Collectors.toList());
+	}
+	
+	private Comment convertToComment(String author, String message) {
+		return new Comment(author, message);
+	}
+	
+	private CommentDto convertToCommentDto(Comment comment) {
+		return CommentDto.builder()
+				.user(comment.getUser())
+				.message(comment.getMessage())
+				.dateCreated(comment.getDateCreated())
+				.likes(comment.getLikes())
+				.build();
+	}
+
+
 }

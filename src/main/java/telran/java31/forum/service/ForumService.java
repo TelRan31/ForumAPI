@@ -1,31 +1,35 @@
 package telran.java31.forum.service;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import telran.java31.forum.dto.CommentDto;
 import telran.java31.forum.dto.DatePeriodDto;
+import telran.java31.forum.dto.NewCommentDto;
+import telran.java31.forum.dto.NewPostDto;
 import telran.java31.forum.dto.PostDto;
-import telran.java31.forum.dto.PostResponseDto;
 
 public interface ForumService {
+	PostDto addNewPost(NewPostDto newPost, String author);
 
-	PostResponseDto addPost(String author, PostDto postDto);
+	PostDto getPost(String id);
 
-	PostResponseDto findPostById(String id);
+	PostDto removePost(String id);
 
-	PostResponseDto deletePost(String id);
+	PostDto updatePost(NewPostDto postUpdateDto, String id);
 
-	PostResponseDto updatePost(String id, PostDto postDto);
+	boolean addLike(String id);
 
-	boolean addLikeToPost(String id);
+	PostDto addComment(String id, String author, NewCommentDto newCommentDto);
 
-	PostResponseDto addCommentToPost(String id, String author, CommentDto commentDto);
-
-	List<PostResponseDto> findPostByAuthor(String author);
-
-	Iterable<PostResponseDto> findPostsByTags(List<String> tags);
-
-	Iterable<PostResponseDto> findPostsCreatedBetweenDates(DatePeriodDto datePeriodDto);
+	Iterable<PostDto> findPostsByAuthor(String author);
+	
+	Iterable<PostDto> findPostsByTags(List<String> tags);
+	
+	Iterable<PostDto> findPostsCreatedBetweenDates(DatePeriodDto datePeriodDto);
+	
+	Iterable<CommentDto> findAllPostComments(String id);
+	
+	Iterable<CommentDto> findAllPostCommentsByAuthor(String id, String author);
 
 }
+
