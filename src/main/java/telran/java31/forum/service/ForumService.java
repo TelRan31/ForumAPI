@@ -32,4 +32,3 @@ public interface ForumService {
 	Iterable<CommentDto> findAllPostCommentsByAuthor(String id, String author);
 
 }
-

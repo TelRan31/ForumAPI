@@ -1,4 +1,4 @@
-package telran.forum.configuration;
+package telran.java31.forum.configuration;
 
 import org.springframework.context.annotation.Configuration;
 
@@ -21,3 +21,4 @@ public class ForumConfiguration {
 	}
 
 }
+
