@@ -1,5 +1,6 @@
 package telran.java31.forum.controller;
 
+import java.security.Principal;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,41 +24,40 @@ public class UserAccountController {
 
 	@Autowired
 	UserAccountService userAccountService;
-	
+
 	@PostMapping("/user")
 	public UserProfileDto register(@RequestBody NewUserDto newUserDto) {
 		return userAccountService.register(newUserDto);
 	}
-	
+
 	@PostMapping("/login")
-	public UserProfileDto userLogin(@RequestHeader("Authorization") String token) {
-		return userAccountService.findUser(token);
+	public UserProfileDto userLogin(Principal principal) {
+		return userAccountService.findUser(principal.getName());
 	}
-	
+
 	@DeleteMapping("/user")
-	public UserProfileDto removeUser(@RequestHeader("Authorization") String token) {
-		return userAccountService.removeUser(token);
+	public UserProfileDto removeUser(Principal principal) {
+		return userAccountService.removeUser(principal.getName());
 	}
-	
+
 	@PutMapping("/user")
-	public UserProfileDto editUser(@RequestBody UserEditDto userEditDto, @RequestHeader("Authorization") String token) {
-		return userAccountService.editUser(userEditDto, token);
+	public UserProfileDto editUser(@RequestBody UserEditDto userEditDto, Principal principal) {
+		return userAccountService.editUser(userEditDto, principal.getName());
 	}
-	
+
 	@PostMapping("/user/{login}/role/{role}")
-	public Set<String> addRole(@PathVariable String login, @PathVariable String role, @RequestHeader("Authorization") String token){
-		return userAccountService.addRole(login, role, token);
+	public Set<String> addRole(@PathVariable String login, @PathVariable String role) {
+		return userAccountService.addRole(login, role);
 	}
-	
+
 	@DeleteMapping("/user/{login}/role/{role}")
-	public Set<String> removeRole(@PathVariable String login, @PathVariable String role, @RequestHeader("Authorization") String token){
-		return userAccountService.removeRole(login, role, token);
+	public Set<String> removeRole(@PathVariable String login, @PathVariable String role) {
+		return userAccountService.removeRole(login, role);
 	}
-	
+
 	@PutMapping("/user/password")
-	public void changePassword(@RequestHeader("Authorization") String token, @RequestHeader("X-Password") String password) {
-		userAccountService.changePassword(token, password);
+	public void changePassword(Principal principal, @RequestHeader("X-Password") String password) {
+		userAccountService.changePassword(principal.getName(), password);
 	}
-	
 
 }

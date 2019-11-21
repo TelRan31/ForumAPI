@@ -7,18 +7,18 @@ import telran.java31.forum.dto.UserEditDto;
 import telran.java31.forum.dto.UserProfileDto;
 
 public interface UserAccountService {
-	
+
 	UserProfileDto register(NewUserDto newUserDto);
-	
-	UserProfileDto findUser(String token);
-	
-	UserProfileDto removeUser(String token);
-	
-	UserProfileDto editUser(UserEditDto userEditDto, String token);
-	
-	Set<String> addRole(String login, String role, String token);
-	
-	Set<String> removeRole(String login, String role, String token);
-	
-	void changePassword(String token, String password);
+
+	UserProfileDto findUser(String login);
+
+	UserProfileDto removeUser(String login);
+
+	UserProfileDto editUser(UserEditDto userEditDto, String login);
+
+	Set<String> addRole(String login, String role);
+
+	Set<String> removeRole(String login, String role);
+
+	void changePassword(String login, String password);
 }

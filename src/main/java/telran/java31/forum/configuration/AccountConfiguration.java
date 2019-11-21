@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedResource;
 
-import telran.java31.forum.exceptions.UserAutenticationException;
+import telran.java31.forum.exceptions.UserAuthentificationException;
 
 @Configuration
 @ManagedResource
@@ -34,7 +34,7 @@ public class AccountConfiguration {
 			String[] credentials = credential.split(":");
 			return new UserCredentials(credentials[0], credentials[1]);
 		} catch (Exception e) {
-			throw new UserAutenticationException();
+			throw new UserAuthentificationException();
 		}
 		
 	}
